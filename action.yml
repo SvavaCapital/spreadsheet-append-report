@@ -1,0 +1,23 @@
+name: 'Coverage Spreadsheet'
+description: 'Append the coverage into a spreadsheet'
+author: 'Shivanshu Srivastava'
+inputs:
+  report:  # id of input
+    description: 'coverage report'
+    required: true
+    default: ''
+  private_key:
+    description: 'private key from google service'
+    required: true
+    default: ''
+  client_email:
+    description: 'client email (bot email)'
+    required: true
+    default: 'bot@user.com'
+  doc_id:
+    description: 'document where we want to append data'
+    required: true
+    default: ''
+runs: 
+  using: node16
+  main: index.js
