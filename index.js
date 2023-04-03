@@ -22,7 +22,7 @@ const getCoveragePercentage = (report) => {
   // this fn fetches coverage percentage from dom report
   const dom = parser.parseFromString(report);
   const divArr = dom.getElementsByTagName("div");
-  return divArr.slice(1);
+  return divArr.slice(1).map((d) => d.innerHTML);
 };
 
 (async () => {
