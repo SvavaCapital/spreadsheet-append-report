@@ -13,22 +13,19 @@ const pushIntoExcel = async (coverage = [], status, msg) => {
   }); // authenticating credential for gcloud service
 
   await doc.loadInfo(); // loads document properties and worksheets
-  const sheet = doc.sheetsByIndex[0];
+  const sheet = doc.sheetsByIndex[1];
   const date = new Date().toLocaleString("default", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
 
-  await sheet.addRows([
-    [
-      `${github.context.base_name} <-- ${github.context.ref_name}`,
-      ...coverage,
-      date,
-      status,
-      msg,
-    ],
-  ]);
+  const prDetails =
+    github.context.base_name && github.context.ref_name
+      ? `${github.context.ref} (${github.context.base_name} <-- ${github.context.ref_name})`
+      : github.context.ref;
+
+  await sheet.addRows([[prDetails || "-", ...coverage, date, status, msg]]);
 };
 
 const getCoveragePercentage = (report) => {
@@ -46,7 +43,8 @@ const getCoveragePercentage = (report) => {
     if (status === "success") pushIntoExcel(coverageReport, "success", "-");
     else throw "Your test cases got failed. Please check!!";
   } catch (err) {
-    pushIntoExcel(Array(4).fill("-"), "failure", err.message);
-    core.setFailed(err.message);
+    if (typeof err === "string")
+      pushIntoExcel(Array(4).fill("-"), "failure", err);
+    else core.setFailed(err.message);
   }
 })();

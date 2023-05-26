@@ -1,6 +1,6 @@
 {
   "name": "spreadsheet-append-report",
-  "version": "v.1.3",
+  "version": "v.1.4",
   "description": "",
   "main": "index.js",
   "scripts": {
