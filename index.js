@@ -14,15 +14,15 @@ const pushIntoExcel = async (coverage = [], status, msg) => {
 
   await doc.loadInfo(); // loads document properties and worksheets
   const sheet = doc.sheetsByIndex[1];
-  const date = new Date().toLocaleString("default", {
+  const date = new Date().toLocaleTimeString("default", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
 
   const prDetails =
-    github.context.base_name && github.context.ref_name
-      ? `${github.context.ref} (${github.context.base_name} <-- ${github.context.ref_name})`
+    github.context.base_ref && github.context.ref_name
+      ? `${github.context.ref} (${github.context.base_ref} <-- ${github.context.ref_name})`
       : github.context.ref;
 
   await sheet.addRows([[prDetails || "-", ...coverage, date, status, msg]]);
