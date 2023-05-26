@@ -6,7 +6,7 @@ const { GoogleSpreadsheet } = require("google-spreadsheet");
 const parser = new DomParser();
 const doc = new GoogleSpreadsheet(core.getInput("doc_id"));
 
-const pushIntoExcel = async (coverage = []) => {
+const pushIntoExcel = async (coverage = [], status, msg) => {
   await doc.useServiceAccountAuth({
     private_key: core.getInput("private_key"),
     client_email: core.getInput("client_email"),
@@ -14,8 +14,13 @@ const pushIntoExcel = async (coverage = []) => {
 
   await doc.loadInfo(); // loads document properties and worksheets
   const sheet = doc.sheetsByIndex[0];
+  const date = new Date().toLocaleString("default", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
-  await sheet.addRows([[github.context.ref, ...coverage, new Date()]]);
+  await sheet.addRows([[github.context.ref, ...coverage, date, status, msg]]);
 };
 
 const getCoveragePercentage = (report) => {
@@ -27,11 +32,13 @@ const getCoveragePercentage = (report) => {
 
 (async () => {
   try {
-    core.notice("Calling our action --> spreadsheet");
     const report = core.getInput("report");
     const coverageReport = getCoveragePercentage(report);
-    pushIntoExcel(coverageReport);
+    if (coverageReport.length > 0)
+      pushIntoExcel(coverageReport, "success", "-");
+    else throw "Empty report";
   } catch (err) {
+    pushIntoExcel(Array(4).fill("-"), "failure", err.message);
     core.setFailed(err.message);
   }
 })();
