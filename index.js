@@ -20,7 +20,15 @@ const pushIntoExcel = async (coverage = [], status, msg) => {
     year: "numeric",
   });
 
-  await sheet.addRows([[github.context.ref, ...coverage, date, status, msg]]);
+  await sheet.addRows([
+    [
+      `${github.context.base_name} <-- ${github.context.ref_name}`,
+      ...coverage,
+      date,
+      status,
+      msg,
+    ],
+  ]);
 };
 
 const getCoveragePercentage = (report) => {
@@ -33,10 +41,10 @@ const getCoveragePercentage = (report) => {
 (async () => {
   try {
     const report = core.getInput("report");
+    const status = core.getInput("status");
     const coverageReport = getCoveragePercentage(report);
-    if (coverageReport.length > 0)
-      pushIntoExcel(coverageReport, "success", "-");
-    else throw "Empty report";
+    if (status === "success") pushIntoExcel(coverageReport, "success", "-");
+    else throw "Your test cases got failed. Please check!!";
   } catch (err) {
     pushIntoExcel(Array(4).fill("-"), "failure", err.message);
     core.setFailed(err.message);
